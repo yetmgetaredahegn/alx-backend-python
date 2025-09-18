@@ -19,7 +19,8 @@ class TestAccessNestedMap(unittest.TestCase):
         ({"a": {"b": 2}}, ("a", "b"), 2),
     ])
     def test_access_nested_map(self, nested_map, path, expected):
-        """Test access_nested_map returns expected value"""
+        """Test access_nested_map
+        returns expected value"""
         self.assertEqual(access_nested_map(nested_map, path), expected)
 
     @parameterized.expand([
@@ -27,7 +28,8 @@ class TestAccessNestedMap(unittest.TestCase):
         ({"a": 1}, ("a", "b"), "'b'"),
     ])
     def test_access_nested_map_exception(self, nested_map, path, expected):
-        """Test access_nested_map raises KeyError for invalid paths"""
+        """Test access_nested_map
+        raises KeyError for invalid paths"""
         with self.assertRaises(KeyError) as ex:
             access_nested_map(nested_map, path)
         self.assertEqual(str(ex.exception), expected)
@@ -42,7 +44,9 @@ class TestGetJson(unittest.TestCase):
     ])
     @patch("utils.requests.get")
     def test_get_json(self, test_url, test_payload, mock_get):
-        """Test get_json returns expected payload from mocked requests"""
+        """Test get_json returns
+        expected payload
+        from mocked requests"""
         mock_response = Mock()
         mock_response.json.return_value = test_payload
         mock_get.return_value = mock_response
