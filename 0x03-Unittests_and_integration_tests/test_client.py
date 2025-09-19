@@ -27,3 +27,21 @@ class TestGithubOrgClient(unittest.TestCase):
         # Assert: get_json was called correctly and result is the mocked payload
         mock_get.assert_called_once_with(f"https://api.github.com/orgs/{org_name}")
         self.assertEqual(result, expected_payload)
+
+
+    def test_public_repos_url(self):
+        # payload we want .org to return
+        test_payload = {"repos_url": "http://fakeurl.com/repos"}
+
+        with patch("client.GithubOrgClient.org", new_callable=PropertyMock) as mock_org:
+            # make .org return our fake payload
+            mock_org.return_value = test_payload
+
+            client = GithubOrgClient("test-org")
+
+            result = client._public_repos_url
+
+            # check if the result is taken from repos_url of the fake payload
+            self.assertEqual(result, "http://fakeurl.com/repos")
+            mock_org.assert_called_once()
+
