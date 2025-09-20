@@ -10,6 +10,11 @@ from client import GithubOrgClient
 
 
 class TestGithubOrgClient(unittest.TestCase):
+    """
+    Unit tests for the GithubOrgClient class.
+    Verifies behavior of .org, _public_repos_url, and .public_repos.
+    """
+
     @parameterized.expand([
         ("google",),
         ("abc",),
