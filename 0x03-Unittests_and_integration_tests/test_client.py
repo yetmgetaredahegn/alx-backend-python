@@ -23,9 +23,14 @@ class TestGithubOrgClient(unittest.TestCase):
         # Act: create client and call org()
         client = GithubOrgClient(org_name)
         result = client.org
-
-        # Assert: get_json was called correctly and result is the mocked payload
-        mock_get.assert_called_once_with(f"https://api.github.com/orgs/{org_name}")
+        
+        """
+        Assert: get_json was called 
+        correctly and result is the mocked payload
+        """
+        mock_get.assert_called_once_with(
+            f"https://api.github.com/orgs/{org_name}"
+            )
         self.assertEqual(result, expected_payload)
 
 
@@ -33,7 +38,10 @@ class TestGithubOrgClient(unittest.TestCase):
         # payload we want .org to return
         test_payload = {"repos_url": "http://fakeurl.com/repos"}
 
-        with patch("client.GithubOrgClient.org", new_callable=PropertyMock) as mock_org:
+        with patch(
+            "client.GithubOrgClient.org", 
+            new_callable=PropertyMock
+            ) as mock_org:
             # make .org return our fake payload
             mock_org.return_value = test_payload
 
@@ -41,11 +49,15 @@ class TestGithubOrgClient(unittest.TestCase):
 
             result = client._public_repos_url
 
-            # check if the result is taken from repos_url of the fake payload
+            """
+            check if the result is taken 
+            from repos_url of the fake payload
+            """
             self.assertEqual(result, "http://fakeurl.com/repos")
             mock_org.assert_called_once()
 
-    @patch("client.get_json")  # mock get_json globally for this test
+    """mock get_json globally for this test"""
+    @patch("client.get_json")  
     def test_public_repos(self, mock_get_json):
         # Payload we want get_json to return
         test_payload = [
