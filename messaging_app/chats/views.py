@@ -11,11 +11,18 @@ class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
 
-    @action(detail=True, methods=["post"])
-    def add_message(self, request, pk=None):
+    def perform_create(self, serializer):
         """
-        Custom action to send a message inside a conversation.
-        Endpoint: POST /api/conversations/{id}/add_message/
+        When creating a new conversation, add the requesting user as a participant.
+        """
+        conversation = serializer.save()
+        conversation.participants.add(self.request.user)
+
+    @action(detail=True, methods=["post"])
+    def send_message(self, request, pk=None):
+        """
+        Custom action to send a message in an existing conversation.
+        Endpoint: POST /api/conversations/{id}/send_message/
         """
         conversation = get_object_or_404(Conversation, pk=pk)
         serializer = MessageSerializer(data=request.data)
@@ -31,6 +38,6 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """
-        Ensure sender is always the logged-in user when creating a message.
+        Always set sender to logged-in user when creating a message.
         """
         serializer.save(sender=self.request.user)
