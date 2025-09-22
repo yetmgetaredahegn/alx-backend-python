@@ -1,5 +1,5 @@
-from rest_framework.permissions import BasePermission
+from rest_framework import permissions 
 
-class IsUserPermission(BasePermission):
+class IsUserPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         return bool(request.user.is_authenticated)
