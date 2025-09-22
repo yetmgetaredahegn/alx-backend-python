@@ -4,6 +4,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
+from chats.filters import MessageFilter
+from chats.pagination import DefaultPagination
 from chats.permissions import IsParticipantOfConversation
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
@@ -13,6 +15,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = MessageFilter
     search_fields = ["participants__email"]
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
 
@@ -37,6 +40,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["message_body"]
+    pagination_class = DefaultPagination
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
 
     def get_queryset(self):
