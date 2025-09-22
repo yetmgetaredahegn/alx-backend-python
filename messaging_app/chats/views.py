@@ -12,6 +12,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["participants__email"]
+    permission_classes = []
 
     @action(detail=True, methods=["post"])
     def send_message(self, request, pk=None):
@@ -27,3 +28,4 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["message_body"]
+    permission_classes = []
