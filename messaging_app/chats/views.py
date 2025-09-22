@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 
-from chats.permissions import IsUserPermission
+from chats.permissions import IsParticipantOfConversation
 
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
@@ -14,7 +14,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["participants__email"]
-    permission_classes = [IsUserPermission]
+    permission_classes = [IsParticipantOfConversation]
 
     @action(detail=True, methods=["post"])
     def send_message(self, request, pk=None):
@@ -30,4 +30,4 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["message_body"]
-    permission_classes = [IsUserPermission]
+    permission_classes = [IsParticipantOfConversation]
