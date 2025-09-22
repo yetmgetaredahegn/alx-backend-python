@@ -1,10 +1,11 @@
-from django_filters.rest_framework import FilterSet
-
+# chats/filters.py
+from django_filters import rest_framework as filters
 from chats.models import Message
 
-class MessageFilter(FilterSet):
+class MessageFilter(filters.FilterSet):
     class Meta:
         model = Message
         fields = {
-            'sent_at': ['gt','lt']
+            "sent_at": ["gt", "lt"],  # messages after/before a datetime
+            "sender": ["exact"],      # optional: filter by sender
         }
