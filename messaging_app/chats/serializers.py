@@ -52,52 +52,48 @@ class MessageSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class ConversationSerializer(serializers.ModelSerializer):
-    conversation_id = serializers.UUIDField(read_only=True)
-
-    # Read: nested display of participants (users)
-    participants = serializers.SerializerMethodField()
-
-    # Write: accept a list of user PKs to create/update participants (nested r/w)
+class ConversationWriteSerializer(serializers.ModelSerializer):
     participants_ids = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), many=True, write_only=True, source="participants"
     )
 
-    # Provide nested messages via SerializerMethodField (satisfies nested inclusion)
+    class Meta:
+        model = Conversation
+        fields = ("participants_ids",)
+
+    def validate(self, attrs):
+        participants = attrs.get("participants")
+        if participants and len(participants) < 2:
+            raise serializers.ValidationError(
+                {"participants": "A conversation must have at least 2 participants."}
+            )
+        return attrs
+
+    def create(self, validated_data):
+        participants = validated_data.pop("participants", [])
+        conv = Conversation.objects.create(**validated_data)
+        conv.participants.set(participants)
+        return conv
+
+    def update(self, instance, validated_data):
+        participants = validated_data.pop("participants", None)
+        instance = super().update(instance, validated_data)
+        if participants is not None:
+            instance.participants.set(participants)
+        return instance
+
+class ConversationReadSerializer(serializers.ModelSerializer):
+    conversation_id = serializers.UUIDField(read_only=True)
+    participants = serializers.SerializerMethodField()
     messages = serializers.SerializerMethodField()
 
     class Meta:
         model = Conversation
-        fields = ("conversation_id", "participants", "participants_ids", "created_at", "messages")
+        fields = ("conversation_id", "participants", "created_at", "messages")
 
     def get_participants(self, obj):
         return UserSerializer(obj.participants.all(), many=True).data
 
     def get_messages(self, obj):
         qs = obj.messages.order_by("sent_at").all()
-        # pass context so MessageSerializer can access request for validation/formatting if needed
         return MessageSerializer(qs, many=True, context=self.context).data
-
-    def validate(self, attrs):
-        # When participants are provided during creation/update, ensure at least 2 participants
-        participants = attrs.get("participants")
-        if participants is not None:
-            if len(participants) < 2:
-                raise serializers.ValidationError({"participants": "A conversation must have at least 2 participants."})
-        return attrs
-
-    def create(self, validated_data):
-        # validated_data will contain 'participants' (because of source="participants")
-        participants = validated_data.pop("participants", [])
-        conv = Conversation.objects.create(**validated_data)
-        if participants:
-            conv.participants.set(participants)
-        return conv
-
-    def update(self, instance, validated_data):
-        # support updating participants via participants_ids
-        participants = validated_data.pop("participants", None)
-        instance = super().update(instance, validated_data)
-        if participants is not None:
-            instance.participants.set(participants)
-        return instance

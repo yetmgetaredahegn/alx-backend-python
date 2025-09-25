@@ -8,16 +8,20 @@ from chats.filters import MessageFilter
 from chats.pagination import DefaultPagination
 from chats.permissions import IsParticipantOfConversation
 from .models import Conversation, Message
-from .serializers import ConversationSerializer, MessageSerializer
+from .serializers import ConversationReadSerializer, ConversationWriteSerializer, MessageSerializer
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
-    serializer_class = ConversationSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     filterset_class = MessageFilter
     search_fields = ["participants__email"]
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
+
+    def get_serializer_class(self):
+        if self.action in ["list", "retrieve"]:
+            return ConversationReadSerializer
+        return ConversationWriteSerializer
 
     @action(detail=True, methods=["post"])
     def send_message(self, request, pk=None):

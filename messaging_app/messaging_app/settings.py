@@ -37,10 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_filters'
+    'django_filters',
     'rest_framework',
     'rest_framework_simplejwt',
     'chats',
+    'core'
 ]
 
 MIDDLEWARE = [
@@ -153,4 +154,6 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "user_id",   # match my custom primary key
+    "USER_ID_CLAIM": "user_id",   # claim in the JWT payload
 }
