@@ -157,3 +157,40 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "user_id",   # match my custom primary key
     "USER_ID_CLAIM": "user_id",   # claim in the JWT payload
 }
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "request_file": {  # 👈 new handler
+            "class": "logging.FileHandler",
+            "filename": "requests.log",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
+        "middleware_logger": {  # 👈 our custom logger
+            "handlers": ["request_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
