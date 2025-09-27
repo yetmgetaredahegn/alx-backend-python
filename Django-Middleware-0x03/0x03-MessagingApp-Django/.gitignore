@@ -1,0 +1,6 @@
+.venv
+.env
+# Byte-compiled files
+*.pyc
+*.pyo
+__pycache__/
