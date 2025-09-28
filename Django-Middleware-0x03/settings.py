@@ -44,12 +44,17 @@ INSTALLED_APPS = [
     'core'
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'messaging_app.chats.middleware.RequestLoggingMiddleware',
+    'messaging_app.chats.middleware.RestrictAccessByTimeMiddleware',
+    'messaging_app.chats.middleware.OffensiveLanguageMiddleware',
+    'messaging_app.chats.middleware.RolepermissionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
