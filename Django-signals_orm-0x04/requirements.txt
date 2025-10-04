@@ -1,0 +1,28 @@
+# Core Framework
+Django>=4.2,<5.0
+
+# Database connector (if using MySQL, uncomment below)
+# mysqlclient>=2.1.1
+
+# If using PostgreSQL instead of MySQL
+# psycopg2-binary>=2.9.9
+
+# Debugging and performance profiling
+django-debug-toolbar>=4.4.2
+
+# For environment variables (.env files)
+python-dotenv>=1.0.1
+
+# For handling datetime and timezone utilities
+pytz>=2024.1
+
+# For testing utilities and coverage
+pytest>=8.2.2
+pytest-django>=4.8.0
+coverage>=7.5.3
+
+# For API testing (optional but useful)
+requests>=2.32.3
+
+# Caching backend (optional; Django LocMemCache is built-in)
+# django-redis>=5.4.0
