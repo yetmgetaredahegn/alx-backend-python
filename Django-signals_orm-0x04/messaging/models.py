@@ -30,8 +30,20 @@ class Message(models.Model):
         related_name='edited_messages'
     )
 
+    # 🧩 Self-referential FK — enables threaded replies
+    parent_message = models.ForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='replies'
+    )
+
     def __str__(self):
         return f'{self.sender} → {self.receiver}: {self.content[:30]}'
+    
+    class Meta:
+        ordering = ['timestamp']
 
 
 class MessageHistory(models.Model):
