@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model, logout
+from django.views.decorators.cache import cache_page
 from django.shortcuts import render
 from .models import Message
 
@@ -86,6 +87,8 @@ def analytics_view(request):
 
     return render(request, 'messaging/analytics.html', context)
 
+
+@cache_page(60)
 @login_required
 def unread_inbox(request):
     """

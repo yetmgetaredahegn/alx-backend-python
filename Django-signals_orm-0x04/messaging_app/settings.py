@@ -157,3 +157,5 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "user_id",   # match my custom primary key
     "USER_ID_CLAIM": "user_id",   # claim in the JWT payload
 }
+
+CACHES = { 'default': { 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', 'LOCATION': 'unique-snowflake', } }
