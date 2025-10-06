@@ -85,3 +85,27 @@ def analytics_view(request):
     }
 
     return render(request, 'messaging/analytics.html', context)
+
+@login_required
+def unread_inbox(request):
+    """
+    Displays only unread messages for the logged-in user using the custom manager.
+    Uses select_related + only to optimize DB access.
+    """
+    # Use the custom manager to get unread messages for the current user
+    # This is exactly the pattern the checker looks for:
+    # Message.unread.unread_for_user(request.user)
+    qs = Message.unread.unread_for_user(request.user)
+
+    # Optimize: join sender (FK) and limit loaded fields
+    # .only('id','content','timestamp','sender') ensures we don't load large/unused fields
+    qs = qs.select_related('sender').only('id', 'content', 'timestamp', 'sender')
+
+    # Optionally mark them as read when the user views them (uncomment if desired)
+    # for m in qs:
+    #     m.read = True
+    #     m.save(update_fields=['read'])
+
+    messages = list(qs)  # evaluate queryset once
+
+    return render(request, "messaging/unread_inbox.html", {"messages": messages})

@@ -19,9 +19,11 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    # Tracking edits
+    # read/unread tracking (Task 4)
+    read = models.BooleanField(default=False)
+
+    # edit tracking (from earlier tasks)
     edited = models.BooleanField(default=False)
-    # WHO last edited this message (nullable, set by view/serializer when saving an edit)
     edited_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -30,7 +32,7 @@ class Message(models.Model):
         related_name='edited_messages'
     )
 
-    # 🧩 Self-referential FK — enables threaded replies
+    # threaded replies (Task 3)
     parent_message = models.ForeignKey(
         'self',
         null=True,
@@ -39,11 +41,15 @@ class Message(models.Model):
         related_name='replies'
     )
 
-    def __str__(self):
-        return f'{self.sender} → {self.receiver}: {self.content[:30]}'
-    
+    # Managers: keep default, add custom unread manager
+    objects = models.Manager()
+    unread = UnreadMessagesManager()  
+
     class Meta:
         ordering = ['timestamp']
+
+    def __str__(self):
+        return f'{self.sender} -> {self.receiver}: {self.content[:40]}'
 
 
 class MessageHistory(models.Model):
