@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: messaging-app
+  labels:
+    app: messaging-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: messaging-app
+  template:
+    metadata:
+      labels:
+        app: messaging-app
+    spec:
+      containers:
+        - name: messaging-app
+          image: messaging_app-web:latest  # your Django Docker image
+          ports:
+            - containerPort: 8860
+          env:
+            - name: DEBUG
+              value: "True"
+            - name: SECRET_KEY
+              value: "django-insecure-oog$%vjzb8n1_wffhj4c!3mj-iaibw95c&_t#(x)1b^)c$hj5f"
+            - name: DB_NAME
+              value: "messaging_app_db"
+            - name: DB_USER
+              value: "app_user"
+            - name: DB_PASSWORD
+              value: "deAlto#Crack357"
+            - name: DB_HOST
+              value: "messaging-mysql"   # Will match your DB Service name later
+            - name: DB_PORT
+              value: "3306"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: messaging-app-service
+spec:
+  selector:
+    app: messaging-app
+  ports:
+    - protocol: TCP
+      port: 8860
+      targetPort: 8860
+  type: ClusterIP
