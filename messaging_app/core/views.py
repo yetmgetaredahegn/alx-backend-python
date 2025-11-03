@@ -5,7 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import permissions
 from chats.models import User
 from core.serializers import RegisterSerializer
-
+from django.http import JsonResponse
 
     
 
@@ -30,3 +30,9 @@ class RegisterView(generics.CreateAPIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+
+
+def health_check(request):
+    return JsonResponse({"status": "ok"}, status=200)

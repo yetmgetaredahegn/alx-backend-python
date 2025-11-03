@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-# Use DB_HOST from environment, default to 'db' for Docker Compose
-DB_HOST=${DB_HOST:-db}
+# Use DB_HOST from environment, default to 'messaging-mysql' for k8s
+DB_HOST=${DB_HOST:-messaging-mysql}
 
 echo "Waiting for MySQL at $DB_HOST to be ready..."
 until nc -z $DB_HOST 3306; do
@@ -15,10 +15,6 @@ echo "MySQL at $DB_HOST is up!"
 echo "Applying database migrations..."
 python manage.py migrate
 
-# Remove existing staticfiles directory and recreate with proper permissions
-echo "Setting up staticfiles directory..."
-rm -rf /app/staticfiles
-mkdir -p /app/staticfiles
 
 echo "Collecting static files..."
 python manage.py collectstatic --noinput

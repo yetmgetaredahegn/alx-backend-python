@@ -29,14 +29,25 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+
+# Create staticfiles directory with proper permissions BEFORE copying code
+RUN mkdir -p /app/staticfiles && chmod 755 /app/staticfiles
+
+
 # Copy application source code into the image
 COPY . .
 
 # Ensure entrypoint is executable (entrypoint.sh will be created next)
 RUN chmod +x ./entrypoint.sh || true
 
-# Create a non-root user and switch to it (security best practice)
+
 RUN useradd --create-home appuser
+
+# Fix ownership of the entire app directory
+RUN chown -R appuser:appuser /app && \
+    chmod -R 755 /app && \
+    chmod +x ./entrypoint.sh
+
 USER appuser
 ENV HOME=/home/appuser
 

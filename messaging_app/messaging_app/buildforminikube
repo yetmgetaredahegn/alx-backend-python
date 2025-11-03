@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Build in Minikube's environment
+eval $(minikube docker-env)
+docker build -t messaging_app-web:latest .
+eval $(minikube docker-env -u)

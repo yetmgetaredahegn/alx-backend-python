@@ -8,3 +8,4 @@ data:
   DB_USER: "app_user"
   DB_HOST: "messaging-mysql"
   DB_PORT: "3306"
+  ALLOWED_HOSTS: "*,.svc.cluster.local,localhost,127.0.0.1"
