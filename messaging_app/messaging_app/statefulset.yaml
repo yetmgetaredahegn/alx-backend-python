@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: messaging-mysql
+spec:
+  selector:
+    matchLabels:
+      app: messaging-mysql
+  serviceName: "messaging-mysql"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: messaging-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: messaging-secrets
+                  key: DB_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: messaging-config
+                  key: DB_NAME
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: messaging-mysql
+spec:
+  clusterIP: None  # Headless service for StatefulSet
+  selector:
+    app: messaging-mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
