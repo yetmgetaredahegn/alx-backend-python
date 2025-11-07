@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Task 2: Scale the Django App Using Kubernetes
+
+echo "=== Starting Task 2: Scaling Django App ==="
+
+# Step 1: Scale the deployment to 3 replicas
+echo "1. Scaling deployment to 3 replicas..."
+kubectl scale deployment messaging-app --replicas=3
+
+# Step 2: Wait for pods to be ready
+echo "2. Waiting for pods to be ready..."
+kubectl wait --for=condition=ready pod -l app=messaging-app --timeout=120s
+
+# Step 3: Verify multiple pods are running
+echo "3. Verifying pods are running..."
+kubectl get pods -l app=messaging-app
+
+# Step 4: Monitor resource usage
+
+# First, enable metrics server if not already
+minikube addons enable metrics-server 2>/dev/null || true
+sleep 10  # Wait for metrics to be available
+
+echo "4. Monitoring resource usage..."
+kubectl top pods -l app=messaging-app
+
+# Load Test Configuration
+LOAD_TEST_THREADS=4
+LOAD_TEST_CONNECTIONS=10  
+LOAD_TEST_DURATION="30s"
+
+# Step 5: Perform load testing (if wrk is installed)
+echo "5. Performing load testing..."
+if command -v wrk &> /dev/null; then 
+    # Get the service URL
+    SERVICE_URL=$(minikube service messaging-app-service --url)
+    echo "Load testing URL: $SERVICE_URL"
+    
+    # Run wrk load test for 30 seconds with 4 threads and 10 connections
+    wrk -t$LOAD_TEST_THREADS -c$LOAD_TEST_CONNECTIONS -d$LOAD_TEST_DURATION $SERVICE_URL
+else
+    echo "wrk not installed. Skipping load test."
+    echo "To install wrk: sudo apt-get install wrk"
+fi
+
+echo "=== Task 2 Complete ==="

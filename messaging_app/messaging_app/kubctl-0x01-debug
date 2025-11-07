@@ -1,0 +1,48 @@
+#!/bin/bash
+
+echo "=== Starting Task 2: Scaling Django App (Debug Version) ==="
+
+# Configuration
+DESIRED_REPLICAS=3
+
+echo "1. Current pod status before scaling..."
+kubectl get pods -l app=messaging-app
+
+echo "2. Scaling deployment to $DESIRED_REPLICAS replicas..."
+kubectl scale deployment messaging-app --replicas=$DESIRED_REPLICAS
+
+echo "3. Waiting for pods to start (not necessarily ready)..."
+sleep 10  # Give pods time to start
+
+echo "4. Current pod status after scaling:"
+kubectl get pods -l app=messaging-app
+
+echo "5. Debugging why pods aren't ready:"
+echo "=== Pod Events ==="
+for pod in $(kubectl get pods -l app=messaging-app -o name); do
+    echo "--- $pod ---"
+    kubectl describe $pod | grep -A 5 "Events:" || echo "No events found"
+done
+
+echo "=== Pod Logs (last 5 lines) ==="
+for pod in $(kubectl get pods -l app=messaging-app -o name); do
+    echo "--- $pod ---"
+    kubectl logs $pod --tail=5 2>/dev/null || echo "No logs available"
+done
+
+echo "6. Checking probe configuration:"
+kubectl get deployment messaging-app -o yaml | grep -A 10 -B 5 "probe"
+
+echo "7. Testing service accessibility:"
+SERVICE_URL=$(minikube service messaging-app-service --url)
+echo "Service URL: $SERVICE_URL"
+
+# Test if we can reach the service
+if curl -s --connect-timeout 5 $SERVICE_URL > /dev/null; then
+    echo "✅ Service is accessible"
+else
+    echo "❌ Service is NOT accessible"
+fi
+
+echo "=== Debug Complete ==="
+echo "Next steps: Fix the readiness/liveness probes in deployment.yaml"
