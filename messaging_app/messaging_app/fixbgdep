@@ -1,0 +1,4 @@
+#!/bin/bash
+kubectl delete pod -l app=messaging-app
+kubectl rollout restart deployment messaging-app-blue
+kubectl rollout restart deployment messaging-app-green
