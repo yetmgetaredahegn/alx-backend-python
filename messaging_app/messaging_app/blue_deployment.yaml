@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: messaging-app
-        image: messaging_app-web:latest
+        image: messaging_app-web:2.0 #for task 5 we use 2.0 for blue green deployment latest 
         imagePullPolicy: Never
         ports:
         - containerPort: 8000

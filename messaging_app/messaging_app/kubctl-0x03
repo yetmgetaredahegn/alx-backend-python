@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+echo "=== Starting Task 5: Rolling Update ==="
+
+# Step 1: Apply the new deployment
+echo "1. Applying updated blue deployment (version 2.0)..."
+kubectl apply -f blue_deployment.yaml
+
+# Step 2: Monitor the rollout progress
+echo "2. Monitoring rollout..."
+kubectl rollout status deployment/messaging-app-blue
+
+# Step 3: Continuous curl test (simulate no downtime)
+SERVICE_IP=$(minikube service messaging-app --url | head -n1)
+
+echo "3. Testing for downtime using curl..."
+for i in {1..15}; do
+  curl -s -o /dev/null -w "%{http_code}\n" $SERVICE_IP || echo "Request failed!"
+  sleep 2
+done
+
+# Step 4: Verify current pods
+echo "4. Checking running pods..."
+kubectl get pods -l app=messaging-app -o wide
+
+echo "=== Rolling Update Complete! Version 2.0 now live ==="
