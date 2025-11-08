@@ -1,0 +1,24 @@
+# Enable the NGINX ingress controller in Minikube
+minikube addons enable ingress
+
+# Verify that the ingress controller is running
+kubectl get pods -n kube-system | grep ingress
+
+# Apply the ingress resource for the Django messaging app
+kubectl apply -f ingress.yaml
+
+# Verify the ingress resource was created
+kubectl get ingress
+
+# Check the ingress rules and address
+kubectl describe ingress messaging-app-ingress
+
+# (Optional) Check services to ensure they are ready
+kubectl get svc
+
+# Get the Minikube IP address to test externally
+minikube ip
+
+# Test access using curl with the host specified in ingress.yaml
+curl -H "Host: messaging.local" http://$(minikube ip)
+
