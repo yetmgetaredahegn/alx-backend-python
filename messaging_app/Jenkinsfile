@@ -10,7 +10,7 @@ pipeline {
         stage('Clone Repo') {
             steps {
                 // Clone your repository
-                git branch: 'main', url: 'https://github.com/<your-username>/alx-backend-python.git'
+                git branch: 'main', url: 'https://github.com/yetmgetaredahegn/alx-backend-python.git'
             }
         }
 
