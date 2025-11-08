@@ -31,8 +31,4 @@ pipeline {
             }
         }
     }
-
-    triggers {
-        none() // manual trigger only
-    }
 }
