@@ -1,10 +1,14 @@
 pipeline {
     agent any
 
+    environment {
+        PYTHON = '/usr/bin/python3'
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main',
+                git branch: 'main', 
                     credentialsId: 'github-cred',
                     url: 'https://github.com/yetmgetaredahegn/alx-backend-python.git'
             }
@@ -12,22 +16,29 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                withPythonEnv('Python3') {
-                    sh 'pip install -r messaging_app/requirements.txt'
-                }
+                sh '''
+                    cd messaging_app
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                withPythonEnv('Python3') {
-                    sh 'pytest messaging_app/tests/ --junitxml=report.xml'
-                }
+                sh '''
+                    cd messaging_app
+                    . venv/bin/activate
+                    pytest --junitxml=test-results.xml
+                '''
             }
-            post {
-                always {
-                    junit 'report.xml'
-                }
+        }
+
+        stage('Report') {
+            steps {
+                junit 'messaging_app/test-results.xml'
             }
         }
     }
