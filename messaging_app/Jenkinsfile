@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        PYTHON = '/usr/bin/python3'
-    }
-
     stages {
         stage('Clone Repository') {
             steps {
@@ -16,13 +12,17 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                withPythonEnv('Python3') {
+                    sh 'pip install -r messaging_app/requirements.txt'
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'pytest messaging_app/tests/ --junitxml=report.xml'
+                withPythonEnv('Python3') {
+                    sh 'pytest messaging_app/tests/ --junitxml=report.xml'
+                }
             }
             post {
                 always {
