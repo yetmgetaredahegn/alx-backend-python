@@ -7,8 +7,7 @@ WORKDIR /app
 # Make Python output immediately (no buffering) — helps logs appear in real time
 ENV PYTHONUNBUFFERED=1
 
-# Install OS packages needed to compile native Python extensions (mysqlclient)
-# --no-install-recommends keeps packages minimal. Clean apt lists afterwards.
+# Install OS packages needed for python builds + docker CLI + git
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       build-essential \
@@ -17,7 +16,9 @@ RUN apt-get update && \
       libssl-dev \
       libffi-dev \
       pkg-config \
-      netcat-openbsd && \
+      netcat-openbsd \
+      git \
+      sudo && \
     rm -rf /var/lib/apt/lists/*
 
 
@@ -41,10 +42,10 @@ COPY . .
 RUN chmod +x ./entrypoint.sh || true
 
 
-RUN useradd --create-home appuser
-
-# Fix ownership of the entire app directory
-RUN chown -R appuser:appuser /app && \
+# Create a non-root user    
+RUN useradd --create-home appuser && \
+    usermod -aG sudo,docker appuser && \
+    chown -R appuser:appuser /app && \
     chmod -R 755 /app && \
     chmod +x ./entrypoint.sh
 

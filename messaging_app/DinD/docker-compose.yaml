@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  dind-docker:
+    image: docker:24-dind
+    container_name: dind-docker
+    privileged: true
+    networks:
+      - jenkins
+    restart: unless-stopped
+
+  jenkins:
+    image: jenkins/jenkins
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      DOCKER_HOST: tcp://dind-docker:2375
+      DOCKER_TLS_CERTDIR: ""   # disable TLS for simplicity
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    networks:
+      - jenkins
+    restart: unless-stopped
+
+volumes:
+  jenkins_home:
+
+networks:
+  jenkins:
+    driver: bridge
