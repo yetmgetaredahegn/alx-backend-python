@@ -1,0 +1,61 @@
+name: Django CI with MySQL
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: messaging_app_db
+          MYSQL_USER: app_user
+          MYSQL_PASSWORD: deAlto#Crack357
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DEBUG: true
+      SECRET_KEY: django-insecure-oog$%vjzb8n1_wffhj4c!3mj-iaibw95c&_t#(x)1b^)c$hj5f
+      DB_NAME: messaging_app_db
+      DB_USER: app_user
+      DB_PASSWORD: deAlto#Crack357
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Wait for MySQL to be ready
+        run: |
+          echo "Waiting for MySQL..."
+          sleep 20
+          mysql -h 127.0.0.1 -uapp_user -pdeAlto#Crack357 -e "SHOW DATABASES;"
+
+      - name: Run migrations and tests
+        run: |
+          python manage.py migrate
+          python manage.py test
